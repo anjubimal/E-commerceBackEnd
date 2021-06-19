@@ -4,7 +4,9 @@ const { Category, Product } = require('../../models');
 // The `/api/categories` endpoint
 
 router.get('/', (req, res) => {
-  User.findAll({})
+  Category.findAll({
+    include: [Product]
+  })
     .then(dbUserData => res.json(dbUserData))
     .catch(err => {
       console.log(err);
@@ -16,7 +18,8 @@ router.get('/:id', (req, res) => {
   Category.findOne({
     where: {
       id: req.params.id
-    }
+    },
+    include: [Product]
   })
     .then(dbUserData => {
       if (!dbUserData) {
@@ -32,7 +35,18 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  // create a new category
+  Category.create(req.body)
+    .then(dbUserData => {
+      if (!dbUserData) {
+        res.status(404).json({ message: 'No user found with this id' });
+        return;
+      }
+      res.json(dbUserData);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 router.put('/:id', (req, res) => {
@@ -54,7 +68,6 @@ router.put('/:id', (req, res) => {
       res.status(500).json(err);
     });
 });
-
 
 
 router.delete('/:id', (req, res) => {
